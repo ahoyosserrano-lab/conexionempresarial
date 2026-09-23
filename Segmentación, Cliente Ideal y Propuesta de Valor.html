@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Segmentación, Cliente Ideal y Propuesta de Valor — Grupo FUSEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --navy:#1a1b47; --lavender:#8d86c6; --lavender-soft:#c7c3e6;
+    --orange:#e2632f; --cream:#f7f4ee; --ink:#1a1b47; --ink-soft:#5b5a7d;
+    --line:rgba(26,27,71,0.12); --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%; background:var(--cream);
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{font-family:'Work Sans',system-ui,sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; align-items:center; min-height:100%;}
+  h1,h2,h3,.serif{font-family:'Lora',Georgia,serif;}
+  .app{width:100%; max-width:520px; min-height:100vh; display:flex; flex-direction:column; background:var(--cream); position:relative;}
+  .topbar{padding:18px 22px 14px; padding-top:calc(18px + env(safe-area-inset-top,0px)); background:var(--navy); color:#fff;
+    display:flex; align-items:center; justify-content:space-between; position:relative; overflow:hidden;}
+  .topbar::after{content:""; position:absolute; right:-30px; top:-30px; width:110px; height:110px; background:var(--orange);
+    clip-path:polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); opacity:.9;}
+  .brand{display:flex; align-items:center; gap:10px; z-index:1;}
+  .brand-mark svg{width:26px;height:26px;display:block;}
+  .brand-name{font-size:.72rem; letter-spacing:.06em; font-weight:600; opacity:.85;}
+  .progress{z-index:1; display:flex; gap:5px;}
+  .progress i{width:13px;height:4px;border-radius:2px; background:rgba(255,255,255,.25); transition:background .3s;}
+  .progress i.on{background:var(--orange);} .progress i.done{background:var(--lavender-soft);}
+  main{flex:1; display:flex; flex-direction:column;}
+  .screen{display:none; flex-direction:column; flex:1; padding:26px 22px 100px; animation:fadein .3s ease;}
+  .screen.active{display:flex;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){.screen{animation:none;}}
+  .eyebrow{font-size:.76rem; color:var(--orange); font-weight:600; margin-bottom:6px;}
+  h1.title{font-size:1.55rem; line-height:1.28; font-weight:700; margin:0 0 8px; color:var(--navy);}
+  p.lede{color:var(--ink-soft); font-size:.95rem; line-height:1.55; margin:0 0 22px;}
+  label.field-label{display:block; font-size:.8rem; font-weight:600; color:var(--ink); margin-bottom:7px;}
+  input[type=text], textarea{width:100%; font-family:'Work Sans',sans-serif; font-size:.98rem; padding:13px 15px;
+    border-radius:13px; border:1.5px solid var(--line); background:#fff; color:var(--ink); outline:none; transition:border-color .15s;}
+  textarea{resize:vertical; min-height:70px; line-height:1.5;}
+  input[type=text]:focus, textarea:focus{border-color:var(--lavender);}
+  .btn{appearance:none; border:none; cursor:pointer; font-family:'Work Sans',sans-serif; font-weight:600; font-size:.98rem;
+    padding:14px 20px; border-radius:100px; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform .12s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--orange); color:#fff;} .btn-primary:disabled{opacity:.35; pointer-events:none;}
+  .btn-ghost{background:transparent; color:var(--navy); border:1.5px solid var(--line);}
+  .btn-block{width:100%;}
+  .bottom-nav{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:520px;
+    padding:14px 22px calc(16px + env(safe-area-inset-bottom,0px)); background:linear-gradient(to top, var(--cream) 60%, transparent);
+    display:flex; gap:10px; z-index:5;}
+  .bottom-nav .btn-ghost{flex:none; width:50px; padding:14px;}
+  .field-block{margin-bottom:18px;}
+  .card{background:#fff; border-radius:16px; border:1px solid var(--line); padding:16px 17px; margin-bottom:12px;}
+
+  /* segmentation */
+  .seg-row{display:flex; gap:8px; margin-bottom:10px;}
+  .seg-row input{flex:1;}
+  .remove-btn{flex:none; width:42px; border-radius:12px; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); font-size:1.1rem; cursor:pointer;}
+  .add-link{background:none; border:none; color:var(--navy); font-weight:600; font-size:.85rem; cursor:pointer; padding:6px 0 18px; text-align:left;}
+  .crit-grid{display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px;}
+  .crit-item .crit-label{display:flex; justify-content:space-between; font-size:.82rem; margin-bottom:6px;}
+  .crit-label b{font-weight:600;} .crit-label span{color:var(--ink-soft);}
+  .dots-row{display:flex; gap:8px;}
+  .dot-btn{flex:1; padding:9px 0; border-radius:10px; border:1.5px solid var(--line); background:#fff; font-weight:600;
+    font-size:.85rem; color:var(--ink-soft); cursor:pointer;}
+  .dot-btn.on{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .score-badge{position:absolute; top:14px; right:14px; background:var(--lavender-soft); color:var(--navy);
+    font-weight:700; font-size:.82rem; padding:4px 10px; border-radius:100px;}
+  .card{position:relative;}
+  .winner{border-color:var(--orange); background:#fff7f3;}
+  .winner-tag{display:inline-block; background:var(--orange); color:#fff; font-size:.68rem; font-weight:700;
+    padding:3px 9px; border-radius:100px; margin-bottom:8px;}
+
+  .callout{background:var(--lavender-soft); border-radius:16px; padding:15px 17px; display:flex; gap:11px; align-items:flex-start; margin-bottom:18px;}
+  .callout .dot{flex:none; width:9px; height:9px; border-radius:50%; background:var(--orange); margin-top:6px;}
+  .callout p{margin:0; font-size:.88rem; line-height:1.5; color:var(--navy);}
+  .callout b{font-weight:700;}
+
+  /* positioning preview */
+  .preview-box{background:var(--navy); color:#fff; border-radius:16px; padding:20px; margin-top:6px; margin-bottom:6px;}
+  .preview-box p{font-family:'Lora',serif; font-style:italic; font-weight:600; font-size:1.05rem; line-height:1.5; margin:0;}
+  .preview-box .blank{color:var(--lavender-soft); font-style:normal; border-bottom:1.5px dashed var(--lavender-soft);}
+
+  /* final card */
+  .card-canvas{background:var(--navy); border-radius:var(--radius); padding:26px 22px 24px; color:#fff; position:relative; overflow:hidden; margin-bottom:20px;}
+  .card-canvas::before{content:""; position:absolute; left:-40px; bottom:-50px; width:150px; height:150px; background:var(--lavender);
+    opacity:.35; clip-path:polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);}
+  .card-eyebrow{font-size:.68rem; letter-spacing:.05em; font-weight:600; color:var(--lavender-soft); margin-bottom:12px; position:relative;}
+  .card-quote{font-family:'Lora',serif; font-style:italic; font-weight:600; font-size:1.08rem; line-height:1.45; margin:0 0 20px; position:relative;}
+  .card-row{margin-bottom:13px; position:relative;}
+  .card-row .k{font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; opacity:.6; margin-bottom:3px;}
+  .card-row .v{font-size:.94rem; font-weight:600; line-height:1.4;}
+  .card-foot{margin-top:18px; position:relative;}
+  .card-foot .name{font-family:'Lora',serif; font-weight:700; font-size:1rem;}
+  .card-foot .org{font-size:.66rem; opacity:.65;}
+  .share-row{display:flex; gap:10px; margin-bottom:12px;}
+  .share-row .btn{flex:1; font-size:.88rem; padding:13px;}
+  .btn-whatsapp{background:#25D366; color:#fff;}
+  .hint-text{font-size:.76rem; color:var(--ink-soft); text-align:center; margin-top:4px; line-height:1.5;}
+  .footer-credit{text-align:center; font-size:.68rem; color:var(--ink-soft); opacity:.6; padding:14px 22px 10px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-mark"><svg viewBox="0 0 40 40" fill="none">
+        <polygon points="20,2 35,11 35,29 20,38 5,29 5,11" stroke="#c7c3e6" stroke-width="2.5"/>
+        <polygon points="20,10 28,20 20,30 12,20" fill="#e2632f"/>
+      </svg></span>
+      <span class="brand-name">GRUPO FUSEM</span>
+    </div>
+    <div class="progress" id="progressDots"></div>
+  </div>
+
+  <main>
+    <!-- 0: intro -->
+    <section class="screen active" data-screen="0">
+      <div class="eyebrow">CONEXIÓN EMPRESARIAL</div>
+      <h1 class="title">Segmentación, Cliente Ideal y Propuesta de Valor</h1>
+      <p class="lede">A quién le vendo, qué le resuelvo, y cómo lo digo en una frase. Vas a construirlo en vivo, en unos minutos, aquí mismo.</p>
+      <div class="field-block">
+        <label class="field-label" for="nameInput">¿Cómo te llamas?</label>
+        <input type="text" id="nameInput" placeholder="Tu nombre" autocomplete="given-name">
+      </div>
+      <div class="field-block">
+        <label class="field-label" for="bizInput">¿Cómo se llama tu negocio?</label>
+        <input type="text" id="bizInput" placeholder="Nombre de tu negocio">
+      </div>
+      <button class="btn btn-primary btn-block" id="startBtn">Empezar</button>
+    </section>
+
+    <!-- 1: segmentation -->
+    <section class="screen" data-screen="1">
+      <div class="eyebrow">PASO 1 DE 4 · SEGMENTACIÓN</div>
+      <h1 class="title">¿A quién le vendes hoy?</h1>
+      <p class="lede">Escribe de 2 a 4 tipos de cliente que ya te compran. Luego califica cada uno — la herramienta elige tu cliente ideal por ti.</p>
+      <div id="segRows"></div>
+      <button class="add-link" id="addSegBtn">+ Agregar otro tipo de cliente</button>
+      <div id="segCriteria"></div>
+    </section>
+
+    <!-- 2: buyer persona -->
+    <section class="screen" data-screen="2">
+      <div class="eyebrow">PASO 2 DE 4 · CLIENTE IDEAL</div>
+      <h1 class="title">Ponle cara a tu cliente ideal</h1>
+      <div class="callout"><div class="dot"></div><p id="segWinnerText">—</p></div>
+      <div class="field-block"><label class="field-label" for="personaName">Nombre ficticio y edad aproximada</label>
+        <input type="text" id="personaName" placeholder="Ej. Rosa, 34 años"></div>
+      <div class="field-block"><label class="field-label" for="personaDay">Un día en su vida</label>
+        <textarea id="personaDay" placeholder="¿Cómo es su día típico? ¿Cuándo tiene tiempo de pensar en esto?"></textarea></div>
+      <div class="field-block"><label class="field-label" for="personaWorry">Qué le quita el sueño respecto a esto</label>
+        <textarea id="personaWorry" placeholder="¿Qué le preocupa antes de comprarte a ti o a la competencia?"></textarea></div>
+      <div class="field-block"><label class="field-label" for="personaWin">Qué sería una victoria para él o ella</label>
+        <textarea id="personaWin" placeholder="Si todo sale perfecto, ¿cómo se siente después?"></textarea></div>
+      <div class="field-block"><label class="field-label" for="personaWhere">Dónde lo encuentro</label>
+        <input type="text" id="personaWhere" placeholder="Ej. Redes sociales, recomendación, la calle"></div>
+    </section>
+
+    <!-- 3: value proposition -->
+    <section class="screen" data-screen="3">
+      <div class="eyebrow">PASO 3 DE 4 · PROPUESTA DE VALOR</div>
+      <h1 class="title">¿Qué le resuelves?</h1>
+      <p class="lede">No describas tu producto completo — solo la parte que conecta directo con lo que ya escribiste de tu cliente ideal.</p>
+      <div class="field-block"><label class="field-label" for="valueRelief">¿Qué haces tú que le quita esa preocupación?</label>
+        <textarea id="valueRelief" placeholder="Ej. Le doy un espacio sin prisas ni interrupciones"></textarea></div>
+      <div class="field-block"><label class="field-label" for="valueWin">¿Qué haces tú que le da esa victoria?</label>
+        <textarea id="valueWin" placeholder="Ej. Sale sintiéndose escuchado, no solo atendido"></textarea></div>
+    </section>
+
+    <!-- 4: positioning phrase -->
+    <section class="screen" data-screen="4">
+      <div class="eyebrow">PASO 4 DE 4 · POSICIONAMIENTO</div>
+      <h1 class="title">Dilo en una frase</h1>
+      <p class="lede">Completa los espacios. No busques que suene bonita todavía — busca que sea cierta.</p>
+      <div class="field-block"><label class="field-label" for="posDiff">¿Qué haces distinto de la competencia?</label>
+        <input type="text" id="posDiff" placeholder="Ej. te doy un respiro real en tu día"></div>
+      <div class="field-block"><label class="field-label" for="posOthers">¿Cómo lo hacen los demás?</label>
+        <input type="text" id="posOthers" placeholder="Ej. entras, pagas y te corren"></div>
+      <label class="field-label">Vista previa de tu frase</label>
+      <div class="preview-box"><p id="posPreview">Completa los pasos anteriores para ver tu frase aquí.</p></div>
+    </section>
+
+    <!-- 5: final card -->
+    <section class="screen" data-screen="5">
+      <div class="eyebrow">TU RESULTADO</div>
+      <h1 class="title">Llévate esto contigo</h1>
+      <p class="lede">Guárdalo o compártelo — es la base de cómo le vas a hablar a tu cliente de ahora en adelante.</p>
+      <div class="card-canvas" id="finalCard">
+        <div class="card-eyebrow">CONEXIÓN EMPRESARIAL · GRUPO FUSEM</div>
+        <p class="card-quote" id="cardPhrase">—</p>
+        <div class="card-row"><div class="k">Mi cliente ideal</div><div class="v" id="cardSegment">—</div></div>
+        <div class="card-row"><div class="k">Le resuelvo</div><div class="v" id="cardValue">—</div></div>
+        <div class="card-foot"><div class="name" id="cardName">—</div><div class="org" id="cardBiz">—</div></div>
+      </div>
+      <div class="share-row">
+        <button class="btn btn-ghost" id="downloadBtn">Descargar tarjeta</button>
+        <button class="btn btn-whatsapp" id="whatsappBtn">Compartir por WhatsApp</button>
+      </div>
+      <p class="hint-text" id="saveHint">Tip: si el botón de descarga no funciona en tu celular, deja el dedo apretado sobre la tarjeta y guarda la imagen.</p>
+      <button class="btn btn-ghost btn-block" id="deeperBtn" style="margin-top:14px;">Quiero ir más a fondo →</button>
+      <button class="btn btn-ghost btn-block" id="restartBtn" style="margin-top:10px;">Volver a empezar</button>
+    </section>
+
+    <!-- 6: deeper dive -->
+    <section class="screen" data-screen="6">
+      <div class="eyebrow">PARA QUIEN QUIERE MÁS</div>
+      <h1 class="title">Profundiza cuando tengas una tarde libre</h1>
+      <p class="lede">Esto no es para el taller de hoy — es para cuando quieras sentarte con tu equipo y llevar esto un nivel más profesional. Ya tienes la base; aquí está la versión completa de las mismas dos herramientas.</p>
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:6px;">Mapa de Empatía</div>
+        <p style="font-size:.86rem; color:var(--ink-soft); line-height:1.5; margin:0 0 10px;">Lo que ya escribiste de tu cliente ideal se expande en 4 cuadrantes: qué piensa y siente, qué dice y hace, qué le frustra, qué le motiva. Tu buyer persona de hoy es el punto de partida — ya no partes de cero.</p>
+        <div style="font-size:.8rem; color:var(--ink-soft);"><b>Tu punto de partida:</b> <span id="deepPersonaRecap">—</span></div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:6px;">Lienzo de Propuesta de Valor (Osterwalder)</div>
+        <p style="font-size:.86rem; color:var(--ink-soft); line-height:1.5; margin:0 0 10px;">Tus dos frases de hoy — lo que le quitas y lo que le das — se convierten en una lista completa de "tareas del cliente", "dolores" y "ganancias" de un lado, y "aliviadores" y "creadores de ganancia" del otro. Es el mismo ejercicio, con más detalle.</p>
+        <div style="font-size:.8rem; color:var(--ink-soft);"><b>Tu punto de partida:</b> <span id="deepValueRecap">—</span></div>
+      </div>
+      <p class="hint-text">Búscalos como "Empathy Map Canvas" y "Value Proposition Canvas" — son gratuitos y se encuentran fácil en internet. Llévate tu tarjeta de hoy como base para llenarlos.</p>
+      <button class="btn btn-ghost btn-block" id="backFromDeepBtn" style="margin-top:20px;">Volver a mi tarjeta</button>
+    </section>
+  </main>
+
+  <div class="bottom-nav" id="bottomNav" style="display:none;">
+    <button class="btn btn-ghost" id="backBtn" aria-label="Atrás">←</button>
+    <button class="btn btn-primary btn-block" id="nextBtn">Siguiente</button>
+  </div>
+  <div class="footer-credit">Grupo FUSEM · Incubadora de empresas</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const CRITERIA = [
+    {id:'volumen', label:'Volumen', q:'¿Cuánto me compra cada vez?'},
+    {id:'frecuencia', label:'Frecuencia', q:'¿Qué tan seguido regresa?'},
+    {id:'facilidad', label:'Facilidad', q:'¿Qué tan fácil es atenderlo?'},
+    {id:'rentabilidad', label:'Rentabilidad', q:'¿Qué tanto me deja de ganancia?'}
+  ];
+
+  const state = {
+    name:'', biz:'',
+    segments:[{name:'', scores:{volumen:0,frecuencia:0,facilidad:0,rentabilidad:0}}, {name:'', scores:{volumen:0,frecuencia:0,facilidad:0,rentabilidad:0}}],
+    winnerIndex:0,
+    persona:{name:'',day:'',worry:'',win:'',where:''},
+    value:{relief:'',win:''},
+    pos:{diff:'',others:''}
+  };
+
+  let currentScreen = 0;
+  const screens = document.querySelectorAll('.screen');
+  const progressDots = document.getElementById('progressDots');
+  const bottomNav = document.getElementById('bottomNav');
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  for(let i=0;i<4;i++){ progressDots.appendChild(document.createElement('i')); }
+  function renderDots(){
+    const dots = progressDots.children;
+    for(let i=0;i<dots.length;i++){
+      dots[i].classList.remove('on','done');
+      const step = i+1;
+      if(currentScreen > step) dots[i].classList.add('done');
+      else if(currentScreen === step) dots[i].classList.add('on');
+    }
+  }
+  function showScreen(n){
+    screens.forEach(s=> s.classList.toggle('active', parseInt(s.dataset.screen,10)===n));
+    currentScreen = n;
+    bottomNav.style.display = (n===0 || n===5) ? 'none' : 'flex';
+    backBtn.style.visibility = (n<=1) ? 'hidden' : 'visible';
+    nextBtn.textContent = (n===4) ? 'Ver mi tarjeta' : 'Siguiente';
+    renderDots();
+    window.scrollTo(0,0);
+    if(n===1) renderSegmentation();
+    if(n===2) renderPersonaScreen();
+    if(n===4) renderPositioningPreview();
+  }
+
+  // ---- Screen 0 ----
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    state.name = document.getElementById('nameInput').value.trim() || 'Emprendedor(a)';
+    state.biz = document.getElementById('bizInput').value.trim() || 'Mi negocio';
+    showScreen(1);
+  });
+
+  // ---- Screen 1: segmentation ----
+  const segRowsEl = document.getElementById('segRows');
+  const segCriteriaEl = document.getElementById('segCriteria');
+
+  function renderSegRows(){
+    segRowsEl.innerHTML = '';
+    state.segments.forEach((seg,i)=>{
+      const row = document.createElement('div');
+      row.className = 'seg-row';
+      row.innerHTML = `<input type="text" placeholder="Tipo de cliente ${i+1}" value="${seg.name.replace(/"/g,'&quot;')}" data-idx="${i}" class="segNameInput">
+        ${state.segments.length>2 ? `<button class="remove-btn" data-idx="${i}" aria-label="Quitar">×</button>` : ''}`;
+      segRowsEl.appendChild(row);
+    });
+    segRowsEl.querySelectorAll('.segNameInput').forEach(inp=>{
+      inp.addEventListener('input', ()=>{ state.segments[parseInt(inp.dataset.idx,10)].name = inp.value; renderSegCriteria(); });
+    });
+    segRowsEl.querySelectorAll('.remove-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.segments.splice(parseInt(btn.dataset.idx,10),1);
+        renderSegRows(); renderSegCriteria();
+      });
+    });
+  }
+  document.getElementById('addSegBtn').addEventListener('click', ()=>{
+    if(state.segments.length>=4) return;
+    state.segments.push({name:'', scores:{volumen:0,frecuencia:0,facilidad:0,rentabilidad:0}});
+    renderSegRows(); renderSegCriteria();
+    if(state.segments.length>=4) document.getElementById('addSegBtn').style.display='none';
+  });
+
+  function segTotal(seg){ return CRITERIA.reduce((s,c)=>s+seg.scores[c.id],0); }
+
+  function renderSegCriteria(){
+    segCriteriaEl.innerHTML = '';
+    state.segments.forEach((seg,i)=>{
+      if(!seg.name.trim()) return;
+      const card = document.createElement('div');
+      card.className = 'card';
+      const total = segTotal(seg);
+      card.innerHTML = `<div class="score-badge">${total} / 12</div>
+        <div style="font-weight:700; font-size:.98rem; margin-bottom:10px; padding-right:60px;">${seg.name}</div>
+        <div class="crit-grid" data-idx="${i}"></div>`;
+      segCriteriaEl.appendChild(card);
+      const grid = card.querySelector('.crit-grid');
+      CRITERIA.forEach(c=>{
+        const item = document.createElement('div');
+        item.className = 'crit-item';
+        item.innerHTML = `<div class="crit-label"><b>${c.label}</b><span>${c.q}</span></div>
+          <div class="dots-row" data-crit="${c.id}" data-idx="${i}">
+            ${[1,2,3].map(v=>`<button type="button" class="dot-btn ${seg.scores[c.id]===v?'on':''}" data-val="${v}">${v}</button>`).join('')}
+          </div>`;
+        grid.appendChild(item);
+      });
+    });
+    segCriteriaEl.querySelectorAll('.dots-row').forEach(row=>{
+      row.querySelectorAll('.dot-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const idx = parseInt(row.dataset.idx,10), crit = row.dataset.crit, val = parseInt(btn.dataset.val,10);
+          state.segments[idx].scores[crit] = val;
+          renderSegCriteria();
+        });
+      });
+    });
+    computeWinner();
+  }
+
+  function computeWinner(){
+    let maxScore = -1, idx = 0;
+    state.segments.forEach((seg,i)=>{
+      if(seg.name.trim() && segTotal(seg) > maxScore){ maxScore = segTotal(seg); idx = i; }
+    });
+    state.winnerIndex = idx;
+  }
+
+  function renderSegmentation(){ renderSegRows(); renderSegCriteria(); }
+
+  // ---- Screen 2: persona ----
+  function renderPersonaScreen(){
+    computeWinner();
+    const winner = state.segments[state.winnerIndex];
+    document.getElementById('segWinnerText').innerHTML = winner && winner.name.trim()
+      ? `Tu cliente ideal, según tus puntajes, es <b>${winner.name}</b>. Vamos a ponerle cara.`
+      : `Regresa al paso anterior y escribe al menos un tipo de cliente.`;
+  }
+  ['personaName','personaDay','personaWorry','personaWin','personaWhere'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', e=>{
+      const key = id.replace('persona','').toLowerCase();
+      state.persona[key] = e.target.value;
+    });
+  });
+
+  // ---- Screen 3: value ----
+  document.getElementById('valueRelief').addEventListener('input', e=>{ state.value.relief = e.target.value; });
+  document.getElementById('valueWin').addEventListener('input', e=>{ state.value.win = e.target.value; });
+
+  // ---- Screen 4: positioning ----
+  document.getElementById('posDiff').addEventListener('input', e=>{ state.pos.diff = e.target.value; renderPositioningPreview(); });
+  document.getElementById('posOthers').addEventListener('input', e=>{ state.pos.others = e.target.value; renderPositioningPreview(); });
+
+  function renderPositioningPreview(){
+    const winner = state.segments[state.winnerIndex];
+    const seg = (winner && winner.name.trim()) ? winner.name : '[tu cliente ideal]';
+    const worry = state.persona.worry.trim() || '[su frustración principal]';
+    const diff = state.pos.diff.trim() || '[lo que haces distinto]';
+    const others = state.pos.others.trim() || '[cómo lo hacen otros]';
+    document.getElementById('posPreview').innerHTML =
+      `"Para <span class="blank">${seg}</span>, que <span class="blank">${worry}</span>, <span class="blank">${state.biz}</span> es el negocio que <span class="blank">${diff}</span>, a diferencia de <span class="blank">${others}</span>."`;
+  }
+
+  // ---- Screen 5: final ----
+  function renderFinalCard(){
+    const winner = state.segments[state.winnerIndex];
+    const seg = (winner && winner.name.trim()) ? winner.name : '—';
+    const worry = state.persona.worry.trim() || '[su frustración principal]';
+    const diff = state.pos.diff.trim() || '[lo que haces distinto]';
+    const others = state.pos.others.trim() || '[cómo lo hacen otros]';
+    document.getElementById('cardPhrase').textContent =
+      `"Para ${seg}, que ${worry}, ${state.biz} es el negocio que ${diff}, a diferencia de ${others}."`;
+    document.getElementById('cardSegment').textContent = seg + (state.persona.name.trim() ? ' ('+state.persona.name.trim()+')' : '');
+    document.getElementById('cardValue').textContent = state.value.win.trim() || state.value.relief.trim() || '—';
+    document.getElementById('cardName').textContent = state.name;
+    document.getElementById('cardBiz').textContent = state.biz;
+  }
+
+  // ---- Navigation ----
+  nextBtn.addEventListener('click', ()=>{
+    if(currentScreen===1){ computeWinner(); if(!state.segments.some(s=>s.name.trim())) return; }
+    if(currentScreen===4){ renderFinalCard(); showScreen(5); return; }
+    showScreen(Math.min(currentScreen+1,4));
+  });
+  backBtn.addEventListener('click', ()=> showScreen(Math.max(currentScreen-1,0)) );
+
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    state.segments = [{name:'', scores:{volumen:0,frecuencia:0,facilidad:0,rentabilidad:0}}, {name:'', scores:{volumen:0,frecuencia:0,facilidad:0,rentabilidad:0}}];
+    state.persona = {name:'',day:'',worry:'',win:'',where:''};
+    state.value = {relief:'',win:''};
+    state.pos = {diff:'',others:''};
+    ['personaName','personaDay','personaWorry','personaWin','personaWhere','valueRelief','valueWin','posDiff','posOthers'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('addSegBtn').style.display='block';
+    showScreen(0);
+  });
+
+  document.getElementById('deeperBtn').addEventListener('click', ()=>{
+    const winner = state.segments[state.winnerIndex];
+    const seg = (winner && winner.name.trim()) ? winner.name : 'tu cliente ideal';
+    const personaBits = [state.persona.name, state.persona.worry, state.persona.win].filter(Boolean);
+    document.getElementById('deepPersonaRecap').textContent = personaBits.length
+      ? `${seg} — ${personaBits.join(' · ')}` : `${seg}`;
+    const valueBits = [state.value.relief, state.value.win].filter(Boolean);
+    document.getElementById('deepValueRecap').textContent = valueBits.length ? valueBits.join(' · ') : '—';
+    screens.forEach(s=> s.classList.toggle('active', s.dataset.screen==='6'));
+    bottomNav.style.display = 'none';
+    window.scrollTo(0,0);
+  });
+  document.getElementById('backFromDeepBtn').addEventListener('click', ()=>{
+    screens.forEach(s=> s.classList.toggle('active', s.dataset.screen==='5'));
+    window.scrollTo(0,0);
+  });
+
+  document.getElementById('whatsappBtn').addEventListener('click', ()=>{
+    const winner = state.segments[state.winnerIndex];
+    const seg = (winner && winner.name.trim()) ? winner.name : '—';
+    const text = `Mi Segmentación y Propuesta de Valor — Conexión Empresarial:\n\n🎯 Cliente ideal: ${seg}\n💡 Le resuelvo: ${state.value.win.trim()||state.value.relief.trim()||'—'}\n🗣️ Mi frase: "Para ${seg}, que ${state.persona.worry.trim()||'—'}, ${state.biz} es el negocio que ${state.pos.diff.trim()||'—'}, a diferencia de ${state.pos.others.trim()||'—'}."\n\n— ${state.name}`;
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('downloadBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Generando…';
+    try{
+      const canvas = await html2canvas(document.getElementById('finalCard'), {backgroundColor:'#1a1b47', scale:2});
+      canvas.toBlob(async (blob)=>{
+        let saved = false;
+        try{
+          const downloads = window.claude ? await window.claude.use('downloads') : null;
+          if(downloads){ await downloads.save({filename:'mi-propuesta-de-valor.png', data: blob}); saved = true; }
+        }catch(e){}
+        if(!saved){ document.getElementById('saveHint').textContent = 'Deja el dedo apretado sobre la tarjeta y elige "Guardar imagen" para conservarla.'; }
+        btn.textContent = original;
+      }, 'image/png');
+    }catch(e){
+      btn.textContent = original;
+      document.getElementById('saveHint').textContent = 'Deja el dedo apretado sobre la tarjeta y elige "Guardar imagen" para conservarla.';
+    }
+  });
+
+  showScreen(0);
+})();
+</script>
+</body>
+</html>
